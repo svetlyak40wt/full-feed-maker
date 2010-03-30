@@ -1,0 +1,3 @@
+MAILTO=svetlyak.40wt@gmail.com
+# m h  dom mon dow  user  command
+10 17 * * * www-data /home/art/projects/full-feed-maker/full_feed_maker.py /home/art/www/static/8020photo.xml
