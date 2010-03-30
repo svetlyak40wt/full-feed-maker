@@ -44,15 +44,20 @@ class FullFeedMaker(object):
         try:
             xml = ET.parse(self._urlopen(self.feed_url))
         except Exception, e:
-            pdb.set_trace()
+            logging.exception('error during feed fetching')
+            sys.exit(1)
+
         channel = xml.find('channel')
         items = channel.findall('item')
 
         for item in items[:self.limit]:
             url = item.find('link').text
             log.debug('downloading content from "%s"' % url)
-            item.find('description').text = ET.CDATA(
-                self.get_description(html.parse(self._urlopen(url))))
+            data = self._urlopen(url)
+            html_data = html.parse(data)
+            description = self.get_description(html_data)
+            cdata = ET.CDATA(description.strip('\x10'))
+            item.find('description').text = cdata
 
         # remove ignored items
         for item in items[self.limit:]:
@@ -82,7 +87,7 @@ class Full8020(FullFeedMaker):
     """Example feed maker for site http://8020photo.com"""
 
     feed_url = 'http://8020photo.com/feed/'
-    limit = 10
+    limit = 5
 
     def __init__(self, output_file):
         super(Full8020, self).__init__()
